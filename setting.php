@@ -10,12 +10,17 @@
 	$ftp_user = GetValue("ftp_user");
 	$ftp_pass = GetValue("ftp_pass"); 
   
-  $checkin_wait = GetValue("checkin_wait");
-  $wait = GetValue("wait");
-  $hold = GetValue("hold");
-  $wait_download_photo = GetValue("wait_download_photo");
-  $sensor = GetValue("sensor");
- 
+	$standby_delay_time = GetValue("standby_delay_time");
+	$checkin_wait = GetValue("checkin_wait");
+	$wait = GetValue("wait");
+	$hold = GetValue("hold");
+	$wait_download_photo = GetValue("wait_download_photo");
+	$sensor = GetValue("sensor");
+	$auto_capture_timeout = GetValue("auto_capture_timeout");
+	
+
+	$rfid_status_ip = GetValue("rfid_status_ip");
+
 ?>
 
 <form action="index.php" method="get">
@@ -66,6 +71,10 @@
 <input type="text" name="sensor" value="<?=$sensor?>" />
 <br/>
 
+<label>standby_delay_time</label>
+<input type="text" name="standby_delay_time" value="<?=$standby_delay_time?>" /> seconds
+<br/>
+
 <label>checkin_wait</label>
 <input type="text" name="checkin_wait" value="<?=$checkin_wait?>" /> seconds
 <br/>
@@ -80,6 +89,10 @@
 
 <label>wait_download_photo</label>
 <input type="text" name="wait_download_photo" value="<?=$wait_download_photo?>" /> seconds
+<br/>
+
+<label>auto_capture_timeout</label>
+<input type="text" name="auto_capture_timeout" value="<?=$auto_capture_timeout?>" /> seconds
 <br/>
 
 <input type="submit" class="btn btn-primary"/>
@@ -107,6 +120,9 @@
 <br/>
 <label>ftp_pass</label>
 <input type="password" name="ftp_pass" value="<?=$ftp_pass?>" />
+<br/>
+<label>rfid_status_ip</label>
+<input type="text" name="rfid_status_ip" value="<?=$rfid_status_ip?>" />
 <br/>
 <input type="submit" class="btn btn-primary"/>
 </fieldset>

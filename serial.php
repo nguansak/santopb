@@ -1,11 +1,16 @@
 <?php
 
+
+
 include "php_serial.class.php";
 $serial = null;
 
 function _init() {
 	global $serial;
-	//if ($serial != null) return;
+	if ($serial != null) return false;
+
+	send_rfid_status(SIGNAL_RED);
+
 
 	$serial = new phpSerial;
 	$serial->deviceSet("/dev/ttyACM0");
@@ -18,6 +23,8 @@ function _init() {
 	$serial->confFlowControl("none");
 
 	$serial->deviceOpen();
+
+	return true;
 }
 
 function microtime_float()
@@ -194,13 +201,16 @@ function wait_senser() {
 
 function wait_auto_capture() { 
 	global $serial,$senser;
+
+	$auto_capture_timeout = GetValue('auto_capture_timeout');
+
 	$senser = [];
 	$read = '';
 	$theResult = '';
 	$start = microtime_float(); 
     $t = microtime_float() - $start;
 	$c = 0 ; 
-	$timeout = 120;
+	$timeout = $auto_capture_timeout;
 	while ( ($read == '') && ($t <= $timeout) ) {
         	$read = $serial->readPort(); 				
        	 	if ($read != '') {
@@ -238,5 +248,9 @@ function wait_auto_capture() {
 
 function _close() {
 	global $serial; 
+
+	send_rfid_status(SIGNAL_OFF);
+
 	$serial->deviceClose();
+	$serial = null;
 }

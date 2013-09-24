@@ -38,6 +38,11 @@ if (isset($_GET['setting'])) {
 	include "setting.php";
 }
 
+$rfid_status = @$_GET['rfid_status'];
+if ($rfid_status) {
+	include "run_rfid_status.php";
+}
+
 if (isset($_GET['file_transfers'])) {
 	include "file_transfers.php";
 }

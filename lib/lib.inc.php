@@ -1,5 +1,9 @@
 <?php
 
+define("SIGNAL_RED", 'red');
+define("SIGNAL_GREEN", 'green');
+define("SIGNAL_OFF", "off");
+
  function GetValue($key) {
   if($key == "machine_code") {
     return GetMachineCodeFromHostName();
@@ -146,20 +150,35 @@ function _sudoo($cmd, &$out = null)
 	return $ret;
 }
 
+function send_rfid_status($cmd)
+{
+	write("send_rfid_status:{$cmd}\r\n");
+	$rfid_status_ip = GetValue("rfid_status_ip");
+
+	$cmd = urlencode($cmd);
+	$url="http://{$rfid_status_ip}/signal.php?cmd={$cmd}";
+
+	file_get_contents($url);
+}
+
+function writeln($content, $fileName = "app") {
+	write("{$content}\r\n", $fileName);
+}
+
 function write($content, $fileName = "app")
 {
-  global $timestamp, $time_start;
-	
+	global $timestamp, $time_start;
+
 	$curr_time = date("His");
 
-$time_end = microtime(true);
-$time = $time_end - $time_start;
-$time = round($time, 2);
+	$time_end = microtime(true);
+	$time = $time_end - $time_start;
+	$time = round($time, 2);
 
-  $filePath = "/var/log/cameracontrol/{$fileName}.log";
-  print $content;
-  $fs = fopen($filePath, 'a');
+	$filePath = "/var/log/cameracontrol/{$fileName}.log";
+	print $content;
+	$fs = fopen($filePath, 'a');
 
-  fwrite($fs, "{$timestamp}+[{$time}] : $content");
-  fclose($fs);
+	fwrite($fs, "{$timestamp}+[{$time}] : $content");
+	fclose($fs);
 }

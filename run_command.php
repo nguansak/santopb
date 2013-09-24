@@ -101,144 +101,61 @@ function checkin() {
 
 	$timestamp = date("ymdhis".$seq) ;
 	SetValue("timestamp",$timestamp);
-	echo "timestamp = $timestamp \n";
-  $checkin_wait = GetValue("checkin_wait");
-  print "checkin_wait {$checkin_wait} seconds";
-  sleep($checkin_wait);
-  run_main();
+
+	writeln( "timestamp = $timestamp \n");
+	$checkin_wait = GetValue("checkin_wait");
+
+	writeln( "checkin_wait {$checkin_wait} seconds");
+	sleep($checkin_wait);
+
+	run_main();
 }
 
 function run_main() {
 
 	$machine_code = GetValue("machine_code");
-  $wait = GetValue("wait");
-  $hold = GetValue("hold");
-  $wait_download_photo = GetValue("wait_download_photo");
-  $sensor = GetValue("sensor");
+	$wait = GetValue("wait");
+	$hold = GetValue("hold");
+	$wait_download_photo = GetValue("wait_download_photo");
+	$sensor = GetValue("sensor");
   
-  run_main_new($wait, $hold, $wait_download_photo, $sensor);
+	run_main_new($wait, $hold, $wait_download_photo, $sensor);
 	//$func = "run_main_{$machine_code}";
 
 	//$func();
 
 }
 
-function run_main1() {
-	write("run_main");
-	_init();
-	_send("normal-mode");
-	sleep(1);
-	_send("trigger-servo");
-
-	$seconds = 1;
-    $nanoseconds = 0.5; // 1000000000   0.5s
-	time_nanosleep($seconds ,$nanoseconds * 1000000000);
-	
-
-	_send("trigger-servo");
-
-
-	wait_senser();
- 
-	$seconds = 1;
-    $nanoseconds = 0.5; // 1000000000   0.5s
-	time_nanosleep($seconds ,$nanoseconds * 1000000000);
-	
-	 
-	_send("press-servo");
-	$seconds = 3;
-    $nanoseconds = 0.1; // 500000000   0.5s
-	time_nanosleep($seconds ,$nanoseconds*1000000000 );
-	_send("release-servo");
-	 
-	sleep(3);
-	_send("usb-mode");
-	sleep(2);
-
-	camera_download();
-
-	sleep(5);
-	_send("normal-mode");
-
-
-	file_transfers();
-	
-
-	_close();
-	echo "end.";
-}
-
-
-function run_main5() {
-		write("run_main");
-	_init();
-	_send("normal-mode");
-	sleep(1);
-	_send("trigger-servo");
-	/*
-	//write("run_main");
-	_init();
-	_send("normal-mode");
-	sleep(5);
-	//_send("trigger-servo");
-
-	//_send("auto-capture:A,10,2000");
-
-	//wait_auto_capture();
-// current time
-echo date('h:i:s') . "\n";
-
-// sleep for 10 seconds
-sleep(5);
-
-// wake up !
-echo date('h:i:s') . "\n";
-
-	_send("usb-mode");
-
-
-	sleep(5);
-	_send("normal-mode");
-
-*/
-}
-
-
-function run_main_002() {
-	run_main_new(3000,1,5);
-}
-
-function run_main_004() {
-	run_main_new(1,1,5);
-}
-
 
 function run_main_new($wait=1, $hold=1, $wait_download_photo=3, $sensor="A") {
-	write("run_main");
-	_init();
-	_send("normal-mode");
-	sleep(1);
-	_send("trigger-servo");
-	//sleep(3);
-	//_send("trigger-servo");
-	_send("auto-capture:{$sensor},{$wait},{$hold}");
+	writeln("run_main");
 
-	wait_auto_capture();
+	if (_init()) {
+		
+		_send("normal-mode");
+		sleep(1);
+		_send("trigger-servo");
+		//sleep(3);
+		//_send("trigger-servo");
+		_send("auto-capture:{$sensor},{$wait},{$hold}");
 
-	sleep($wait_download_photo);
-	_send("usb-mode");
+		wait_auto_capture();
 
-	camera_download();
+		sleep($wait_download_photo);
+		_send("usb-mode");
 
-	sleep(3);
+		camera_download();
 
-	_send("normal-mode");
+		sleep(3);
 
-	file_transfers();
-	
+		_send("normal-mode");
 
-	_close();
-	echo "end.";
+		file_transfers();
+		
+
+		_close();
+	}
+	writeln("end.");
 }
 
 
@@ -251,37 +168,37 @@ function capture() {
 
 	$timestamp = date("ymdhis".$seq) ;
 	SetValue("timestamp",$timestamp);
-	echo "timestamp = $timestamp \n";
+	writeln("timestamp = $timestamp");
 
 
 	write("run_main");
 
-	_init();
-	_send("normal-mode");
-	sleep(1);
-	_send("trigger-servo");
-	sleep(3);
+	if (_init()) {
+		_send("normal-mode");
+		sleep(1);
+		_send("trigger-servo");
+		sleep(3);
 
-	_send("press-servo");
-	$seconds = 2;
-    $nanoseconds = 0.1; // 500000000   0.5s
-	time_nanosleep($seconds ,$nanoseconds*1000000000 );
-	_send("release-servo");
+		_send("press-servo");
+		$seconds = 2;
+		$nanoseconds = 0.1; // 500000000   0.5s
+		time_nanosleep($seconds ,$nanoseconds*1000000000 );
+		_send("release-servo");
 
-	sleep(3);
-	_send("usb-mode");
+		sleep(3);
+		_send("usb-mode");
 
-	camera_download();
+		camera_download();
 
-	sleep(3);
+		sleep(3);
 
-	_send("normal-mode");
-	_close();
+		_send("normal-mode");
+		_close();
 
-	file_transfers();
+		file_transfers();
+	}
 	
-
-	echo "end.";
+	writeln( "end.");
 }
 
 

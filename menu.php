@@ -35,3 +35,6 @@
 <a class="btn btn-primary" href="?cmd=auto_capture">auto_capture</a>
 
 <hr/>
+<a class="btn btn-primary" href="?rfid_status=off">Off</a>
+<a class="btn btn-primary" href="?rfid_status=green">Green</a>
+<a class="btn btn-primary" href="?rfid_status=red">Red</a>
