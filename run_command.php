@@ -96,6 +96,8 @@ function whoami() {
 function checkin() {
 	set();
 
+	send_rfid_status(SIGNAL_RED);
+
 	$seq = rand(0,99);
 	$seq = str_pad($seq, 2, "0", STR_PAD_LEFT); 
 
@@ -109,6 +111,9 @@ function checkin() {
 	sleep($checkin_wait);
 
 	run_main();
+
+	send_rfid_status(SIGNAL_OFF);
+
 }
 
 function run_main() {

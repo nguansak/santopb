@@ -165,9 +165,10 @@ function writeln($content, $fileName = "app") {
 	write("{$content}\r\n", $fileName);
 }
 
+$log_id = date("Ymd_His");
 function write($content, $fileName = "app")
 {
-	global $timestamp, $time_start;
+	global $log_id, $time_start;
 
 	$curr_time = date("His");
 
@@ -179,6 +180,6 @@ function write($content, $fileName = "app")
 	print $content;
 	$fs = fopen($filePath, 'a');
 
-	fwrite($fs, "{$timestamp}+[{$time}] : $content");
+	fwrite($fs, "{$log_id}+[{$time}] : $content");
 	fclose($fs);
 }

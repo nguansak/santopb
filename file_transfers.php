@@ -20,7 +20,7 @@ $current_date = date("Ymd") ;
 $project_code = GetValue("project_code") ;
 $machine_code = GetValue("machine_code") ;
 
-echo "$ftp_server ; $ftp_user ;  $ftp_pass \n";
+echo "$ftp_server ; $ftp_user ;  \n";
 
 $files_list = array() ;
 echo "list {$root_pb}\n";
@@ -39,12 +39,28 @@ foreach( $users_dir as $dir ) {
 		$files_list[$user_id][$time] = $files ;
 	}
 } 
- 
+
+?>
+<style type="text/css">
+#image {
+    transform-origin: top left; /* IE 10+, Firefox, etc. */
+    -webkit-transform-origin: top left; /* Chrome */
+    -ms-transform-origin: top left; /* IE 9 */
+}
+
+#image.rotate180 {
+    transform: rotate(180deg) translate(-100%,-100%);
+    -webkit-transform: rotate(180deg) translate(-100%,-100%);
+    -ms-transform: rotate(180deg) translateX(-100%,-100%);
+}
+</style>
+<?php
+
 $conn = ftp_connect($ftp_server) or die("Could not connect");
 ftp_login($conn,$ftp_user,$ftp_pass);
 if($conn) {
 	$mkdir = "{$ftp_incomming}/{$current_date}" ;
-	echo "mkdir $mkdir\n";
+	write( "mkdir $mkdir\n");
 	if(!@ftp_chdir ($conn,$mkdir)) {
 		ftp_mkdir($conn, $mkdir);
 	}
@@ -52,7 +68,7 @@ if($conn) {
 	foreach($files_list as $user => $value) {
 		
 		$mkdir_user = "{$mkdir}/{$user}" ;
-		echo "mkdir $mkdir_user\n";
+		write( "mkdir $mkdir_user\n");
 		if(!@ftp_chdir ($conn,$mkdir_user)) {
 			ftp_mkdir($conn, $mkdir_user);
 		}
@@ -63,8 +79,11 @@ if($conn) {
 				$str_seq = str_pad($seq++, 2, "0", STR_PAD_LEFT); 
 				$target_filename = "{$mkdir_user}/{$project_code}{$machine_code}_{$time}_{$str_seq}.JPG" ;
 				$rs = ftp_put($conn, "{$target_filename}" ,$file, FTP_BINARY);
+				write("FTP from '{$file}' to '{$target_filename}'\n");
 				print "FTP File to : {$target_filename} ->" . ( $rs ? "True" : "False" ) . "\n" ;
-        print "<img src='http://10.14.2.51/photo{$target_filename}' width='320' height='180' /><br />";
+				print "<a href='http://10.14.2.51/photo{$target_filename}' target='blank'>";
+				print "<img src='http://10.14.2.51/photo{$target_filename}' width='320' height='180' id='image' class='rotate180'/><br />";
+				print "</a>";
 				if($rs) {
 					unlink($file) ;
 				}

@@ -13,10 +13,12 @@ set_time_limit(60*60*2); // 2h
 @ob_end_flush();
 ob_implicit_flush(true);
 
+echo "<pre>";
+
 $handle = popen("tail -f /var/log/cameracontrol/app.log 2>&1", 'r');
 while(!feof($handle)) {
     $buffer = fgets($handle);
-    echo "$buffer\n";
+    echo "$buffer";
     flush();
 }
 pclose($handle);
