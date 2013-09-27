@@ -180,6 +180,9 @@ function write($content, $fileName = "app")
 	print $content;
 	$fs = fopen($filePath, 'a');
 
-	fwrite($fs, "{$log_id}+[{$time}] : $content");
+	if ($content != '.') {
+		$content = "{$log_id}+[{$time}] : $content";
+	}
+	fwrite($fs, $content);
 	fclose($fs);
 }
