@@ -155,10 +155,12 @@ function send_rfid_status($cmd)
 	write("send_rfid_status:{$cmd}\r\n");
 	$rfid_status_ip = GetValue("rfid_status_ip");
 
-	$cmd = urlencode($cmd);
-	$url="http://{$rfid_status_ip}/signal.php?cmd={$cmd}";
+	//if (!empty(trim($rfid_status_ip))) {
+		$cmd = urlencode($cmd);
+		$url="http://{$rfid_status_ip}/signal.php?cmd={$cmd}";
 
-	file_get_contents($url);
+		file_get_contents($url);
+	//}
 }
 
 function writeln($content, $fileName = "app") {
