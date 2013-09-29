@@ -101,7 +101,7 @@ function checkin() {
 	$seq = rand(0,99);
 	$seq = str_pad($seq, 2, "0", STR_PAD_LEFT); 
 
-	$timestamp = date("ymdhis".$seq) ;
+	$timestamp = date("YmdHis".$seq) ;
 	SetValue("timestamp",$timestamp);
 
 	writeln( "timestamp = $timestamp \n");
@@ -144,19 +144,20 @@ function run_main_new($wait=1, $hold=1, $wait_download_photo=3, $sensor="A") {
 		//_send("trigger-servo");
 		_send("auto-capture:{$sensor},{$wait},{$hold}");
 
-		wait_auto_capture();
+		if (wait_auto_capture()) {
 
-		sleep($wait_download_photo);
-		_send("usb-mode");
+			sleep($wait_download_photo);
+			_send("usb-mode");
 
-		camera_download();
+			camera_download();
 
-		sleep(3);
+			sleep(3);
 
-		_send("normal-mode");
+			_send("normal-mode");
 
-		file_transfers();
+			file_transfers();
 		
+		}
 
 		_close();
 	}
@@ -171,9 +172,11 @@ function capture() {
 	$seq = rand(0,99);
 	$seq = str_pad($seq, 2, "0", STR_PAD_LEFT); 
 
-	$timestamp = date("ymdhis".$seq) ;
+	$timestamp = date("YmdHis".$seq) ;
 	SetValue("timestamp",$timestamp);
 	writeln("timestamp = $timestamp");
+
+	SetValue("timestamp",$timestamp);
 
 
 	write("run_main");

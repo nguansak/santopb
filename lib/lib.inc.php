@@ -5,15 +5,18 @@ define("SIGNAL_GREEN", 'green');
 define("SIGNAL_OFF", "off");
 
  function GetValue($key) {
+  //writeln("GetValue '{$key}'");
   if($key == "machine_code") {
     return GetMachineCodeFromHostName();
   }
   $machine_code = GetMachineCodeFromHostName();
 	$file = "./data/$machine_code/$key.txt";
+	//writeln("from file '{$file}'");
 	if (file_exists($file)) {
-		$handle = fopen($file, "r");
-		$value = fread($handle, filesize($file));
-		fclose($handle);
+		$value = file_get_contents($file);
+		//$handle = fopen($file, "r");
+		//$value = fread($handle, filesize($file));
+		//fclose($handle);
 		return $value ;
 	} else {
 		return GetDefaultValue($key);
@@ -21,14 +24,18 @@ define("SIGNAL_OFF", "off");
  }
 
  function GetDefaultValue($key) {
-	$file = "./data/$key.txt";
-	if (file_exists($file)) {
-		$handle = fopen($file, "r");
-		$value = fread($handle, filesize($file));
-		fclose($handle);
-		return $value ;
-	} else {
-		return false;
+	
+	if (isset($key)) {
+		$file = "./data/$key.txt";
+		if (file_exists($file)) {
+			$value = file_get_contents($file);
+			//$handle = fopen($file, "r");
+			//$value = fread($handle, filesize($file));
+			//fclose($handle);
+			return $value ;
+		} else {
+			return false;
+		}
 	}
  }
 
@@ -152,15 +159,16 @@ function _sudoo($cmd, &$out = null)
 
 function send_rfid_status($cmd)
 {
-	write("send_rfid_status:{$cmd}\r\n");
 	$rfid_status_ip = GetValue("rfid_status_ip");
 
-	//if (!empty(trim($rfid_status_ip))) {
+	write("send_rfid_status:{$cmd} to '{$rfid_status_ip}'\r\n");
+
+	if (!empty($rfid_status_ip)) {
 		$cmd = urlencode($cmd);
 		$url="http://{$rfid_status_ip}/signal.php?cmd={$cmd}";
 
 		file_get_contents($url);
-	//}
+	}
 }
 
 function writeln($content, $fileName = "app") {
