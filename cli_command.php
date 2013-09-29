@@ -31,11 +31,12 @@ function runProcess()
 function getProcessCommand()
 {
 	//write_daemon_log("Get Process Command from 'comman.run'");
+	write(".");
 
-	if (file_exists("command.run"))
+	if (file_exists("/var/www/command.run"))
 	{
 	
-		$data = file_get_contents("command.run");
+		$data = file_get_contents("/var/www/command.run");
 		$arrCommand = json_decode($data);
 
 		$next_run = $arrCommand->next_run;

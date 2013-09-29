@@ -3,6 +3,7 @@
 include_once("./lib/lib.inc.php");
 
 $userid = $_GET['userid'];
+write("\r\n");
 write("Got checkin {$userid}\r\n");
 
 if (!file_exists("command.run"))
