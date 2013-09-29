@@ -40,3 +40,4 @@
 <a class="btn btn-primary" href="?rfid_status=red">Red</a>
 <hr/>
 <a class="btn btn-primary" href="tail_log.php" target="_blank">Tail Log</a>
+<a class="btn btn-primary" href="tail_log2.php" target="_blank">Tail Log2</a>
