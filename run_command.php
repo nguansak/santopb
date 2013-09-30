@@ -93,6 +93,10 @@ function whoami() {
 	_exec("whoami");
 }
  
+function lsusb() {
+	_sudo("lsusb");
+}
+
 function checkin() {
 	set();
 

@@ -32,6 +32,7 @@
 <a class="btn btn-primary" href="?cmd=testsu">testsu</a>
 <a class="btn btn-primary" href="?cmd=mount">mount</a>
 <a class="btn btn-primary" href="?cmd=unmount">unmount</a>
+<a class="btn btn-primary" href="?cmd=lsusb">lsusb</a>
 <a class="btn btn-primary" href="?cmd=auto_capture">auto_capture</a>
 
 <hr/>
