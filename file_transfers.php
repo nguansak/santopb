@@ -77,9 +77,12 @@ if($conn) {
 			$seq = 1 ;
 			foreach($files as $file ) {
 				$str_seq = str_pad($seq++, 2, "0", STR_PAD_LEFT); 
-				$target_filename = "{$mkdir_user}/{$project_code}{$machine_code}_{$time}_{$str_seq}.JPG" ;
+				$filename = "{$project_code}{$machine_code}_{$time}_{$str_seq}.JPG";
+				$target_filename = "{$mkdir_user}/{$filename}" ;
 				$rs = ftp_put($conn, "{$target_filename}" ,$file, FTP_BINARY);
-				write("FTP from '{$file}' to '{$target_filename}'\n");
+				//write("FTP from '{$file}' to '{$target_filename}'\n");
+				$target_filename_inbox = str_replace("incomming", "inbox", $target_filename);
+				write("FTP to <a href='http://10.14.2.51/photo{$target_filename_inbox}' target='blank'>{$target_filename}</a>\r\n");
 				print "FTP File to : {$target_filename} ->" . ( $rs ? "True" : "False" ) . "\n" ;
 				print "<a href='http://10.14.2.51/photo{$target_filename}' target='blank'>";
 				print "<img src='http://10.14.2.51/photo{$target_filename}' width='320' height='180' id='image' class='rotate180'/><br />";

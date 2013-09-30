@@ -5,15 +5,18 @@ define("SIGNAL_GREEN", 'green');
 define("SIGNAL_OFF", "off");
 
  function GetValue($key) {
+  //writeln("GetValue '{$key}'");
   if($key == "machine_code") {
     return GetMachineCodeFromHostName();
   }
   $machine_code = GetMachineCodeFromHostName();
 	$file = "./data/$machine_code/$key.txt";
+	//writeln("from file '{$file}'");
 	if (file_exists($file)) {
-		$handle = fopen($file, "r");
-		$value = fread($handle, filesize($file));
-		fclose($handle);
+		$value = file_get_contents($file);
+		//$handle = fopen($file, "r");
+		//$value = fread($handle, filesize($file));
+		//fclose($handle);
 		return $value ;
 	} else {
 		return GetDefaultValue($key);
@@ -21,14 +24,18 @@ define("SIGNAL_OFF", "off");
  }
 
  function GetDefaultValue($key) {
-	$file = "./data/$key.txt";
-	if (file_exists($file)) {
-		$handle = fopen($file, "r");
-		$value = fread($handle, filesize($file));
-		fclose($handle);
-		return $value ;
-	} else {
-		return false;
+	
+	if (isset($key)) {
+		$file = "./data/$key.txt";
+		if (file_exists($file)) {
+			$value = file_get_contents($file);
+			//$handle = fopen($file, "r");
+			//$value = fread($handle, filesize($file));
+			//fclose($handle);
+			return $value ;
+		} else {
+			return false;
+		}
 	}
  }
 
@@ -152,31 +159,54 @@ function _sudoo($cmd, &$out = null)
 
 function send_rfid_status($cmd)
 {
-	write("send_rfid_status:{$cmd}\r\n");
 	$rfid_status_ip = GetValue("rfid_status_ip");
 
-	$cmd = urlencode($cmd);
-	$url="http://{$rfid_status_ip}/signal.php?cmd={$cmd}";
+	write("send_rfid_status:{$cmd} to '{$rfid_status_ip}'\r\n");
 
-	file_get_contents($url);
+	if (!empty($rfid_status_ip)) {
+		$cmd = urlencode($cmd);
+		$url="http://{$rfid_status_ip}/signal.php?cmd={$cmd}";
+
+		file_get_contents($url);
+	}
 }
 
 function writeln($content, $fileName = "app") {
 	write("{$content}\r\n", $fileName);
 }
 
+function write2($content, $fileName = "app") {
+	write("cc" . $content);
+}
+
 $log_id = date("Ymd_His");
-function write($content, $fileName = "app")
+function write($content, $fileName = "app", $check_file=false)
 {
 	global $log_id, $time_start;
 
 	$curr_time = date("His");
 
 	$time_end = microtime(true);
+
+
 	$time = $time_end - $time_start;
 	$time = round($time, 2);
+	$time = number_format($time, 2);
+
+	$machine_code = GetValue("machine_code");
+
+	$curr_date = date("Ymd"); 
+	$fileName = "L{$curr_date}_{$machine_code}_{$fileName}";
 
 	$filePath = "/var/log/cameracontrol/{$fileName}.log";
+
+	if ($check_file) {
+		if (!file_exists($filePath)) {
+			_exec("sudo touch {$filePath}");
+			_exec("sudo chown linaro:linaro {$filePath}");
+		}
+	}
+
 	print $content;
 	$fs = fopen($filePath, 'a');
 
