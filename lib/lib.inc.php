@@ -175,18 +175,38 @@ function writeln($content, $fileName = "app") {
 	write("{$content}\r\n", $fileName);
 }
 
+function write2($content, $fileName = "app") {
+	write("cc" . $content);
+}
+
 $log_id = date("Ymd_His");
-function write($content, $fileName = "app")
+function write($content, $fileName = "app", $check_file=false)
 {
 	global $log_id, $time_start;
 
 	$curr_time = date("His");
 
 	$time_end = microtime(true);
+
+
 	$time = $time_end - $time_start;
 	$time = round($time, 2);
+	$time = number_format($time, 2);
+
+	$machine_code = GetValue("machine_code");
+
+	$curr_date = date("Ymd"); 
+	$fileName = "L{$curr_date}_{$machine_code}_{$fileName}";
 
 	$filePath = "/var/log/cameracontrol/{$fileName}.log";
+
+	if ($check_file) {
+		if (!file_exists($filePath)) {
+			_exec("sudo touch {$filePath}");
+			_exec("sudo chown linaro:linaro {$filePath}");
+		}
+	}
+
 	print $content;
 	$fs = fopen($filePath, 'a');
 

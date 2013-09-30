@@ -101,7 +101,7 @@ function checkin() {
 	$seq = rand(0,99);
 	$seq = str_pad($seq, 2, "0", STR_PAD_LEFT); 
 
-	$timestamp = date("YmdHis".$seq) ;
+	$timestamp = date("ymdHis".$seq) ;
 	SetValue("timestamp",$timestamp);
 
 	writeln( "timestamp = $timestamp \n");
@@ -172,7 +172,7 @@ function capture() {
 	$seq = rand(0,99);
 	$seq = str_pad($seq, 2, "0", STR_PAD_LEFT); 
 
-	$timestamp = date("YmdHis".$seq) ;
+	$timestamp = date("ymdHis".$seq) ;
 	SetValue("timestamp",$timestamp);
 	writeln("timestamp = $timestamp");
 
@@ -187,11 +187,7 @@ function capture() {
 		_send("trigger-servo");
 		sleep(3);
 
-		_send("press-servo");
-		$seconds = 2;
-		$nanoseconds = 0.1; // 500000000   0.5s
-		time_nanosleep($seconds ,$nanoseconds*1000000000 );
-		_send("release-servo");
+		_send("trigger-servo");
 
 		sleep(3);
 		_send("usb-mode");

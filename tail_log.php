@@ -1,4 +1,8 @@
 <?php
+
+require_once "lib/lib.inc.php";
+
+
 error_reporting(E_ALL); 
 ini_set("display_errors", true); 
 set_time_limit(60*60*2); // 2h
@@ -15,7 +19,18 @@ ob_implicit_flush(true);
 
 echo "<pre>";
 
-$handle = popen("sudo tail -f /var/log/cameracontrol/app.log 2>&1", 'r');
+
+$fileName = 'app';
+$machine_code = GetValue("machine_code");
+
+$curr_date = date("Ymd"); 
+$fileName = "L{$curr_date}_{$machine_code}_{$fileName}";
+
+$filePath = "/var/log/cameracontrol/{$fileName}.log";
+
+echo( $filePath);
+
+$handle = popen("sudo tail -n 80 -F {$filePath} 2>&1", 'r');
 while(!feof($handle)) {
     $buffer = fgets($handle);
     echo "$buffer";

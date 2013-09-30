@@ -128,7 +128,7 @@ function process_result_capture($result, $time) {
 		$val = explode("|", $cmd);
 		//print_r($val);
 		if ($val[0] == "#auto-capture-done") {
-			write( "Auto Capture Done");
+			writeln( "Auto Capture Done");
 			return "#auto-capture-done";
 		}
 		
