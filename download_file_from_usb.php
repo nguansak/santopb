@@ -39,11 +39,18 @@ function move_all_files_from_usbdrive($temp_picture_folder, $not_download_photo=
   _sudo("rm -Rf /mnt/usbdrive/DCIM/*"); 
 }
 
-function auto_mount_usbdrive($n) {
+function auto_mount_usbdrive($n, $retry=2) {
   global $mount_point;
   
   write( "> Auto mount usbdrive\n");
-  retrive_mount_point($n);
+
+  while ($retry>0) {
+
+    _send("usb-mode"); // make sure it in usb mode
+    
+    retrive_mount_point($n);
+    $retry = $retry - 1;
+  }
 
   if ($mount_point) {
     write( "> Mount usb drive to '" . $mount_point . "'\n");
