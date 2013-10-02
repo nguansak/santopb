@@ -31,7 +31,12 @@ function runProcess()
 function getProcessCommand()
 {
 	//write_daemon_log("Get Process Command from 'comman.run'");
-	write(".", "app", true);
+	if (is_offline()) {
+		write("#", "app", true);
+		return false;
+	} else {
+		write(".", "app", true);
+	}
 
 	if (file_exists("/var/www/command.run"))
 	{

@@ -1,5 +1,5 @@
-<html><head><meta http-equiv="refresh" content="3" /></head><body>
 <?php
+
 require_once "lib/lib.inc.php";
 
 
@@ -17,7 +17,21 @@ set_time_limit(60*60*2); // 2h
 //@ob_end_flush();
 //ob_implicit_flush(true);
 
+if (!isset($_GET['n'])) {
+?>
+<html><head><meta http-equiv="refresh" content="3" /></head><body>
+<?php
+}
+
+
 echo "<pre>";
+
+
+$lines = '80';
+
+if (isset($_GET['n'])) {
+	$lines = $_GET['n'];
+}
 
 echo date("Ymd_His") . "\r\n";
 
@@ -31,7 +45,7 @@ $filePath = "/var/log/cameracontrol/{$fileName}.log";
 
 echo( $filePath);
 
-$handle = popen("sudo tail -n 80 {$filePath} 2>&1", 'r');
+$handle = popen("sudo tail -n {$lines} {$filePath} 2>&1", 'r');
 
 while(!feof($handle)) {
     $buffer = fgets($handle);

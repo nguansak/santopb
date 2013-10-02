@@ -157,8 +157,12 @@ function _sudoo($cmd, &$out = null)
 	return $ret;
 }
 
-function send_rfid_status($cmd)
+function send_rfid_status($cmd, $control_command=false)
 {
+	if (($control_command==false)&&(is_offline())) {
+		return false;
+	}
+
 	$rfid_status_ip = GetValue("rfid_status_ip");
 
 	write("send_rfid_status:{$cmd} to '{$rfid_status_ip}'\r\n");
@@ -210,9 +214,14 @@ function write($content, $fileName = "app", $check_file=false)
 	print $content;
 	$fs = fopen($filePath, 'a');
 
-	if ($content != '.') {
+	if (($content != '.')&&($content != '#')) {
 		$content = "{$log_id}+[{$time}] : $content";
 	}
 	fwrite($fs, $content);
 	fclose($fs);
+}
+
+
+function is_offline() {
+	return file_exists("/var/www/offline.lock");
 }

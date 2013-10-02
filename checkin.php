@@ -2,9 +2,16 @@
 
 include_once("./lib/lib.inc.php");
 
+
+
 $userid = $_GET['userid'];
 write("\r\n");
 write("Got checkin {$userid}\r\n");
+
+if (is_offline()) {
+	write("System is offline!!");
+	return false;
+}
 
 if (!file_exists("command.run"))
 {
