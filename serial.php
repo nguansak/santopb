@@ -37,7 +37,10 @@ function microtime_float()
 function _send($cmd) {
 	global $serial;
 	write( "$cmd\n");
-	$serial->sendMessage($cmd."\0");
+
+	if ($serial) {
+		$serial->sendMessage($cmd."\0");
+	}
 }
 
 function _read() {

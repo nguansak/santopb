@@ -304,6 +304,21 @@ function auto_capture() {
 
 }
 
+function ensure_usb_normal_mode() {
+
+	write("ensure_usb_normal_mode\r\n");
+
+	return "";
+
+	if (_init()) {
+
+		_send("normal-mode");
+	
+		_close();
+	}
+
+}
+
 if (function_exists($cmd)) {
 	$cmd();
 }

@@ -11,6 +11,8 @@ require_once "serial.php";
 require_once 'System/Daemon.php';
 
 require_once "lib/lib.inc.php";
+require_once "run_command.php";
+
 	
 error_reporting(E_ALL); 
 
@@ -20,8 +22,7 @@ if (!defined('DAEMON_MODE'))
 }
 
 function runProcess() 
-{
-	
+{	
 	getProcessCommand();
 	
 }
@@ -36,6 +37,11 @@ function getProcessCommand()
 		return false;
 	} else {
 		write(".", "app", true);
+
+		// Ensure camera in USB mode
+		if (date('s')=='00') {
+			ensure_usb_normal_mode();
+		}
 	}
 
 	if (file_exists("/var/www/command.run"))
@@ -68,8 +74,6 @@ function getProcessCommand()
 
 function process_command() {
 	global $time_start;
-
-	include_once "run_command.php";
 
 	$time_start = microtime(true);
 

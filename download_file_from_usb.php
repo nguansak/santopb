@@ -44,11 +44,21 @@ function auto_mount_usbdrive($n, $retry=2) {
   
   write( "> Auto mount usbdrive\n");
 
-  while ($retry>0) {
+  while ($retry>=0) {
 
-    _send("usb-mode"); // make sure it in usb mode
-    
-    retrive_mount_point($n);
+    $mount_point = retrive_mount_point($n);
+
+    if (empty($mount_point)) {
+
+      // make sure it in usb mode
+      _send("trigger-servo");
+      _send("usb-mode"); 
+      
+    } else {
+      break;
+    }
+
+
     $retry = $retry - 1;
   }
 
@@ -93,14 +103,55 @@ function retrive_mount_point($n) {
 
 
 function get_mount_point() {
+
   write( "> Get mount point\n");
-  for ($i=0;$i<20;$i++) {
-	  $m = "/dev/sd" . chr(ord('a')+$i) . "1";
-	  //echo $m . "\n";
-		if (file_exists($m)) return $m;
-  //if (file_exists("/dev/sdb1")) return "/dev/sdb1";
+
+  $devicePath = "";
+  $contents = file_get_contents('/proc/partitions');
+  
+  $lines = explode("\n", $contents);
+  foreach ($lines as $line) {
+
+    $words = explode(' ', $line);
+    $words = array_filter($words, "strlen");
+    $words = array_values($words);
+
+    if (count($words)==4) {
+      $minorNumber = intval($words[1]);
+      $deviceName = $words[3];
+
+      if (startsWith($deviceName, 'sd'))
+      {
+        $path = "/sys/class/block/" . $deviceName;
+
+        if (is_link($path))
+        {
+          $realpath = realpath($path);
+
+          if (strpos($realpath, '/usb')>0)
+          {
+            $checkDevicePath = "/dev/{$deviceName}";
+            if (file_exists($checkDevicePath))
+            {
+              $devicePath = $checkDevicePath;
+            }
+          }  
+        }     
+      }
+
+    }
   }
-  return "";
+
+
+  return $devicePath;
+
+  //for ($i=0;$i<20;$i++) {
+	//  $m = "/dev/sd" . chr(ord('a')+$i) . "1";
+	//  echo $m . "\n";
+	//	if (file_exists($m)) return $m;
+  //if (file_exists("/dev/sdb1")) return "/dev/sdb1";
+  //}
+  //return "";
   /*
   partitionsFile = open("/proc/partitions") 
   lines = partitionsFile.readlines()[2:]#Skips the header lines
@@ -136,6 +187,8 @@ function download_file_from_usb() {
 
 	auto_download_photo($USBDRIVE_DETECT_TIME,$temp_picture_folder);
 }
+
+
 
 /*
  whoami

@@ -222,6 +222,22 @@ function write($content, $fileName = "app", $check_file=false)
 }
 
 
+//function startsWith($haystack, $needle)
+//{
+//    return !strncmp($haystack, $needle, strlen($needle));
+//}
+
+function startsWith($haystack, $needle)
+{
+    return $needle === "" || strpos($haystack, $needle) === 0;
+}
+function endsWith($haystack, $needle)
+{
+    return $needle === "" || substr($haystack, -strlen($needle)) === $needle;
+}
+
+
+
 function is_offline() {
 	return file_exists("/var/www/offline.lock");
 }
