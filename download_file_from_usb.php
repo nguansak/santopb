@@ -108,8 +108,10 @@ function get_mount_point() {
 
   $devicePath = "";
   $contents = file_get_contents('/proc/partitions');
-  
+
   $lines = explode("\n", $contents);
+
+  $drives = array();
   foreach ($lines as $line) {
 
     $words = explode(' ', $line);
@@ -122,25 +124,38 @@ function get_mount_point() {
 
       if (startsWith($deviceName, 'sd'))
       {
-        $path = "/sys/class/block/" . $deviceName;
+        $drives[$deviceName] = true;
 
-        if (is_link($path))
-        {
-          $realpath = realpath($path);
+        if (strlen($deviceName)==4) {
+          $mainDrive = substr($deviceName, 0, 3);
+          unset($drives[$mainDrive]);
+        }
 
-          if (strpos($realpath, '/usb')>0)
-          {
-            $checkDevicePath = "/dev/{$deviceName}";
-            if (file_exists($checkDevicePath))
-            {
-              $devicePath = $checkDevicePath;
-            }
-          }  
-        }     
       }
 
     }
   }
+
+  foreach ($drives as $deviceName => $value) {
+    // Check if drive is exist
+    $path = "/sys/class/block/" . $deviceName;
+    echo "$path \n";
+    if (is_link($path))
+    {
+      $realpath = realpath($path);
+
+      if (strpos($realpath, '/usb')>0)
+      {
+        $checkDevicePath = "/dev/{$deviceName}";
+        if (file_exists($checkDevicePath))
+        {
+          $devicePath = $checkDevicePath;
+          return $devicePath;
+        }
+      }  
+    }  
+  }
+   
 
 
   return $devicePath;
