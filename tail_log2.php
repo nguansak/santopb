@@ -1,4 +1,5 @@
-<?php
+68\]442qbh]
+"1<?php
 
 require_once "lib/lib.inc.php";
 
@@ -17,7 +18,8 @@ set_time_limit(60*60*2); // 2h
 //@ob_end_flush();
 //ob_implicit_flush(true);
 
-if (!isset($_GET['n'])) {
+//if (!isset($_GET['n'])) 
+{
 ?>
 <html><head><meta http-equiv="refresh" content="3" /></head><body>
 <?php
