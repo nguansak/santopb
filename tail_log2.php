@@ -41,6 +41,11 @@ $fileName = 'app';
 $machine_code = GetValue("machine_code");
 
 $curr_date = date("Ymd"); 
+
+if (isset($_GET['d'])) {
+	$curr_date = $_GET['d'];
+}
+
 $fileName = "L{$curr_date}_{$machine_code}_{$fileName}";
 
 $filePath = "/var/log/cameracontrol/{$fileName}.log";
