@@ -1,7 +1,9 @@
 <?php
 
+
 define("SIGNAL_RED", 'red');
 define("SIGNAL_GREEN", 'green');
+define("SIGNAL_ORANGE", 'orange');
 define("SIGNAL_OFF", "off");
 
  function GetValue($key) {
@@ -56,9 +58,9 @@ function GetMachineCodeFromHostName() {
   return "00" . substr($hostname, strlen($hostname) - 1);
 }
 
-function _exec($cmd, &$out = null)
+function _exec($cmd, &$out = null, $verbal=true)
 {
-	write( "exec \$ $cmd\n");
+	write( "exec \$ $cmd");
 	$desc = array(
 		1 => array("pipe", "w"),
 		2 => array("pipe", "w")
@@ -77,11 +79,16 @@ function _exec($cmd, &$out = null)
 
 	if (func_num_args() == 2) $out = array($ret, $err);
 
-	write( "> $ret");
+	if (!empty($ret)) {
+		if ($verbal) {
+			write( "> $ret");
+		}
+	}
+
 	if ($retVal!=0) 
 		write( "> exist code $retVal $err"); 
-	write( "\n");
-	return $retVal;
+	//writeln();
+	return $ret;
 } 
 
 //function _sudo($cmd, &$out = null)
@@ -113,59 +120,35 @@ function _exec($cmd, &$out = null)
 //	return $retVal;
 //} 
 
-function _sudo($cmd, &$out = null)
+function _sudo($cmd, &$out = null, $verbal=true)
 {
-	return _exec("sudo ".$cmd,$out);
+	return _exec("sudo ".$cmd, $out, $verbal);
 }
 
-function _sudo222($cmd, &$out = null)
-{
-	print "\$ sudo $cmd\n";
-	$desc = array(
-		1 => array("pipe", "w"),
-		2 => array("pipe", "w")
-	);
+function _sudo_rmdir($file) {
+	$out = "";
+	$result = _sudo("rm -Rf {$file}", $out, false);
 
-	//system('echo "PASS" | sudo -u root -S COMMAND');
-	$sudo = 'sudo ' .$cmd;
-	$proc = proc_open($sudo, $desc, $pipes);
-
-	$ret = stream_get_contents($pipes[1]);
-	$err = stream_get_contents($pipes[2]);
-
-	fclose($pipes[1]);
-	fclose($pipes[2]);
-
-	$retVal = proc_close($proc);
-
-	if (func_num_args() == 2) $out = array($ret, $err);
-
-	print "$ret";
-	if ($retVal!=0) 
-		print "exist code $retVal $err"; 
-	print "\n";
-	return $retVal;
-} 
-function _sudoo($cmd, &$out = null)
-{
-	write( "\$ sudo $cmd\n");
-	$sudo = 'sudo ' .$cmd;
-	$ret = shell_exec($sudo);
-	
-	write( "$ret");
-	
-	return $ret;
+	if (empty($result))
+	{
+		return true;
+	} else {
+		return false;
+	}
 }
 
 function send_rfid_status($cmd, $control_command=false)
 {
 	if (($control_command==false)&&(is_offline())) {
 		return false;
+		//$cmd = SIGNAL_OFF;
 	}
 
 	$rfid_status_ip = GetValue("rfid_status_ip");
 
-	write("send_rfid_status:{$cmd} to '{$rfid_status_ip}'\r\n");
+	if (!$control_command) {
+		write("send_rfid_status:{$cmd} to '{$rfid_status_ip}'");
+	}
 
 	if (!empty($rfid_status_ip)) {
 		$cmd = urlencode($cmd);
@@ -175,16 +158,15 @@ function send_rfid_status($cmd, $control_command=false)
 	}
 }
 
-function writeln($content, $fileName = "app") {
-	write("{$content}\r\n", $fileName);
+function writeln($content='', $fileName = "app") {
+	write("{$content}\n", $fileName);
 }
 
-function write2($content, $fileName = "app") {
-	write("cc" . $content);
-}
 
 $log_id = date("Ymd_His");
-function write($content, $fileName = "app", $check_file=false)
+$time_start = microtime(true);
+
+function write($content='', $fileName = "app", $check_file=false)
 {
 	global $log_id, $time_start;
 
@@ -192,10 +174,10 @@ function write($content, $fileName = "app", $check_file=false)
 
 	$time_end = microtime(true);
 
-
 	$time = $time_end - $time_start;
 	$time = round($time, 2);
 	$time = number_format($time, 2);
+	$time = str_pad($time, 5, "0", STR_PAD_LEFT);
 
 	$machine_code = GetValue("machine_code");
 
@@ -211,11 +193,11 @@ function write($content, $fileName = "app", $check_file=false)
 		}
 	}
 
-	print $content;
+	print "$content\n";
 	$fs = fopen($filePath, 'a');
 
 	if (($content != '.')&&($content != '#')) {
-		$content = "{$log_id}+[{$time}] : $content";
+		$content = "\n{$log_id}+[{$time}] : $content";
 	}
 	fwrite($fs, $content);
 	fclose($fs);
@@ -231,13 +213,40 @@ function startsWith($haystack, $needle)
 {
     return $needle === "" || strpos($haystack, $needle) === 0;
 }
+
 function endsWith($haystack, $needle)
 {
     return $needle === "" || substr($haystack, -strlen($needle)) === $needle;
 }
 
+function generate_new_timestamp() {
+	$seq = rand(0,99);
+	$seq = str_pad($seq, 2, "0", STR_PAD_LEFT); 
+
+	$timestamp = date("ymdHis".$seq) ;
+
+	return $timestamp;
+}
+
+function online() {
+	writeln("Go Online");
+	@unlink("/var/www/offline.lock");
+	send_rfid_status(SIGNAL_GREEN);
+}
+
+function offline() {
+	writeln("Go Offline");
+	@touch("/var/www/offline.lock");
+	send_rfid_status(SIGNAL_OFF);
+}
 
 
 function is_offline() {
-	return file_exists("/var/www/offline.lock");
+	$status = file_exists("/var/www/offline.lock");
+	return $status;
+}
+
+function is_in_pocess() {
+	$status = file_exists("command.run");
+	return $status;
 }

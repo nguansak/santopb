@@ -1,48 +1,49 @@
 <?php
 
-_exec('whoami');
-_sudo('whoami');
-
-//_exec('find /mnt/usbdrive/DCIMwewe/ -name \*.JPG');
 $USBDRIVE_DETECT_TIME = 20;
 $mount_point = ""; 
 
-if (!isset($userid)) {
-	$userid = "123";
-}
-if (!isset($timeStamp)) {
-	$seq = rand(0,99);
-	$seq = str_pad($seq, 2, "0", STR_PAD_LEFT); 
-	$timeStamp = date("ymdhis".$seq) ;
-}
-
-$folder = "{$userid}/{$timeStamp}";
-$temp_picture_folder = "/tmp/photobooth/{$folder}/";
-
-write( "Working Folder: " . $temp_picture_folder . "\n");
-
-
  
-function move_all_files_from_usbdrive($temp_picture_folder, $not_download_photo=false) { 
-  write( "> Move all file from usbdrive to '" . $temp_picture_folder . "'\n");
-  _exec("ls /mnt");
-  _exec("ls /mnt/usbdrive");
-  _exec("mkdir -p " . $temp_picture_folder);
-  _exec("find /mnt/usbdrive/DCIM/ -name \*.JPG"); 
+function move_all_files_from_usbdrive($temp_picture_folder, $not_download_photo=false) {
+  write( "> Move all file from usbdrive to '" . $temp_picture_folder . "'");
+  
+  _sudo("ls /mnt/usbdrive");
 
-  if (!$not_download_photo) {
-	  _exec("find /mnt/usbdrive/DCIM/ -name \*.JPG -exec mv {} " . $temp_picture_folder . " \;");
+  $file_list = _sudo("find /mnt/usbdrive/DCIM/ -name \*.JPG");
+
+  if (!empty($file_list)) {
+
+    _sudo("mkdir -p " . $temp_picture_folder);
+    _sudo("ls $temp_picture_folder");
+  
+    if (!$not_download_photo) {
+  	  _sudo("find /mnt/usbdrive/DCIM/ -name \*.JPG -exec mv {} " . $temp_picture_folder . " \;");
+    }
+
+    $file_list_check = _sudo("find /mnt/usbdrive/DCIM/ -name \*.JPG"); 
+
+    if (!$not_download_photo) {
+      if (!empty($file_list_check))
+      {
+        write("Still has file after move");
+        return false;
+      }
+    }
+
+    _sudo("chown -Rf linaro:linaro " . $temp_picture_folder);
+    _sudo("rm -Rf /mnt/usbdrive/DCIM/*");
+
   }
 
-  //_exec("chown -Rf www-data:www-data " . $temp_picture_folder);
-  _exec("ls -l /mnt/usbdrive/DCIM/");
-  _sudo("rm -Rf /mnt/usbdrive/DCIM/*"); 
+  return true;
+
 }
 
 function auto_mount_usbdrive($n, $retry=2) {
   global $mount_point;
   
-  write( "> Auto mount usbdrive\n");
+  write( "> Auto mount usbdrive");
+
 
   while ($retry>=0) {
 
@@ -55,7 +56,9 @@ function auto_mount_usbdrive($n, $retry=2) {
       _send("usb-mode"); 
       
     } else {
+
       break;
+
     }
 
 
@@ -63,13 +66,15 @@ function auto_mount_usbdrive($n, $retry=2) {
   }
 
   if ($mount_point) {
-    write( "> Mount usb drive to '" . $mount_point . "'\n");
+    write( "> Mount usb drive to '" . $mount_point . "'");
     _sudo("/bin/mount " . $mount_point . " /mnt/usbdrive");
-	if (file_exists("/mnt/usbdrive")) 
-		return "ok";
-	return "";
-  }
-  else {
+	 
+    if (file_exists("/mnt/usbdrive"))  {
+      return "ok";
+    }
+		  
+	 return "";
+  } else {
     print "here";
     return "";
   }
@@ -78,21 +83,23 @@ function auto_mount_usbdrive($n, $retry=2) {
 function unmount_usbdrive() {
   global $mount_point;
 
-  if (!$mount_point)
+  if (!$mount_point) {
     return;
+  }
 
-  write( "> Unmount usb drive\n");
+  write( "> Unmount usb drive");
   _sudo("/bin/umount " . $mount_point . " /mnt/usbdrive");
 }
 
 function retrive_mount_point($n) {
   global $mount_point;
-  write( "> Retrive mount point (retry $n)\n");
+  write( "> Retrive mount point (retry $n)");
+
   while ($n > 0) {
     $mount_point = get_mount_point();
     if ($mount_point)
 	  {
-		write( "found mounth_pount $mount_point\n");
+		  write( "found mounth_pount $mount_point");
       return $mount_point;
 	  }
     sleep(1);
@@ -104,7 +111,7 @@ function retrive_mount_point($n) {
 
 function get_mount_point() {
 
-  write( "> Get mount point\n");
+  write( "> Get mount point");
 
   $devicePath = "";
   $contents = file_get_contents('/proc/partitions');
@@ -139,7 +146,7 @@ function get_mount_point() {
   foreach ($drives as $deviceName => $value) {
     // Check if drive is exist
     $path = "/sys/class/block/" . $deviceName;
-    echo "$path \n";
+    //echo "$path \n";
     if (is_link($path))
     {
       $realpath = realpath($path);
@@ -155,8 +162,6 @@ function get_mount_point() {
       }  
     }  
   }
-   
-
 
   return $devicePath;
 
@@ -188,19 +193,50 @@ function get_mount_point() {
 
 
 function auto_download_photo($n,$temp_picture_folder, $not_download_photo=false) { 
-	write(  "> Auto download photo\n");
+	write(  "> Auto download photo");
+
+  $return_result = false;
+
 	if (auto_mount_usbdrive($n)=="ok") {
-		move_all_files_from_usbdrive($temp_picture_folder, $not_download_photo);
+		
+    $return_result = move_all_files_from_usbdrive($temp_picture_folder, $not_download_photo);
+
 		unmount_usbdrive();
-		write( "> done\n");
-	} else 
-		write( "> fail\n");
+
+	}
+
+  if ($return_result) {
+    write( "> auto_download_photo done");
+  } else {
+    write( "> auto_download_photo fail");
+  }
+
+  return $return_result;
 }
 
-function download_file_from_usb() {
-	global $temp_picture_folder, $USBDRIVE_DETECT_TIME;
+function download_file_from_usb($userid, $timestamp) {
+	global $USBDRIVE_DETECT_TIME;
 
-	auto_download_photo($USBDRIVE_DETECT_TIME,$temp_picture_folder);
+  if (!isset($userid)) {
+    $userid = "123";
+  }
+
+  if (!isset($timestamp)) {
+    $seq = rand(0,99);
+    $seq = str_pad($seq, 2, "0", STR_PAD_LEFT); 
+    $timestamp = date("ymdHis".$seq) ;
+  }
+
+  $folder = "{$userid}/{$timestamp}";
+  $photobooth_folder = "/store/photobooth/";
+
+  _sudo("chown -Rf linaro:linaro {$photobooth_folder}");
+
+  $temp_picture_folder = "{$photobooth_folder}{$folder}/";
+
+  write("Working Folder: " . $temp_picture_folder);
+
+	return auto_download_photo($USBDRIVE_DETECT_TIME,$temp_picture_folder);
 }
 
 

@@ -18,6 +18,7 @@ date_default_timezone_set("Asia/Bangkok");
 
 include "serial.php";
 include "./lib/lib.inc.php";
+
 $cmd = @$_GET['precmd'];
 if ($cmd) {
 	include "run_command.php";

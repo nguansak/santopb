@@ -11,6 +11,7 @@ require_once "serial.php";
 require_once 'System/Daemon.php';
 
 require_once "lib/lib.inc.php";
+
 require_once "run_command.php";
 
 	
@@ -24,24 +25,28 @@ if (!defined('DAEMON_MODE'))
 function runProcess() 
 {	
 	getProcessCommand();
-	
 }
-
-
 
 function getProcessCommand()
 {
+	global $run_main_state;
+
 	//write_daemon_log("Get Process Command from 'comman.run'");
 	if (is_offline()) {
 		write("#", "app", true);
+
+		send_rfid_status(SIGNAL_OFF, true);
+
+		ensure_usb_normal_mode('00');
+		
 		return false;
 	} else {
 		write(".", "app", true);
 
-		// Ensure camera in USB mode
-		if (date('s')=='00') {
-			ensure_usb_normal_mode();
-		}
+		send_rfid_status(SIGNAL_GREEN, true);
+
+		ensure_usb_normal_mode('00');
+		
 	}
 
 	if (file_exists("/var/www/command.run"))
@@ -59,26 +64,91 @@ function getProcessCommand()
 
 			write_daemon_log($data);
 
-			$userid = $arrCommand->userid;
-			write_daemon_log("Process [user id: {$userid}]");
+			if (isset($arrCommand->userid)) {
+				$userid = $arrCommand->userid;
+				SetValue("userid", $userid);
+			}
 
-			SetValue("userid", $userid);
+			// Initial Timestamp
+			if (isset($arrCommand->timestamp)) {
+				$timestamp = $arrCommand->timestamp;
+			} else {
+				$timestamp = generate_new_timestamp() ;
+			}
+			SetValue("timestamp",$timestamp);
+
+			// Initial last run state
+			if (isset($arrCommand->lastState)) {
+				$run_main_state = $arrCommand->lastState;
+				write("#### RESUME STATE {$run_main_state}");
+			} else {
+				writeln("==============================================================================================")
+				writeln("START RUNNING");
+			}
+
+			write("PARAM userid = {$userid}");
+			write("PARAM timestamp = {$timestamp}");
+			
+			write_daemon_log("Process [user id: {$userid}]");
 
 			process_command();
 
-			unlink("command.run");
+			if ($run_main_state !== "done") {
+
+				writeln("#### NOT COMPLETE PROCESS !!!");
+
+				ensure_usb_normal_mode();
+
+				$system_recovery_delay = GetValue(system_recovery_delay);
+
+				if ($system_recovery_delay) {
+					writeln("sleep {$system_recovery_delay} secs");
+					sleep($system_recovery_delay);
+				}
+
+				$userid = GetValue("userid");
+				$timestamp = GetValue("timestamp");
+
+				$arrCommand->lastState = $run_main_state;
+				$arrCommand->timestamp = $timestamp;
+			
+				if (isset($arrCommand->retryCount)) {
+
+					if ($arrCommand->retryCount < 10) {
+						$arrCommand->retryCount += 1;
+					} else {
+						writeln("#### RETRY FAIL !!");
+
+						// System Alert !!
+
+						offline();
+					}
+
+				} else {
+					$arrCommand->retryCount = 0;
+				}
+
+				$json = json_encode($arrCommand);
+
+				file_put_contents("/var/www/command.run", $json);
+
+			} else {
+
+				writeln("FINISH RUNNING");
+
+				@unlink("/var/www/command.run");
+			}
+
+			//unlink("command.run");
 		}
 		
 	}
 }
 
 function process_command() {
-	global $time_start;
-
-	$time_start = microtime(true);
-
+	
 	//capture();
-	checkin();
+	run_main();
 
 }
 

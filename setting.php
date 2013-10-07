@@ -18,6 +18,7 @@
 	$sensor = GetValue("sensor");
 	$auto_capture_timeout = GetValue("auto_capture_timeout");
 	
+	$system_recovery_delay = GetValue("system_recovery_delay");
 
 	$rfid_status_ip = GetValue("rfid_status_ip");
 
@@ -93,6 +94,10 @@
 
 <label>auto_capture_timeout</label>
 <input type="text" name="auto_capture_timeout" value="<?=$auto_capture_timeout?>" /> seconds
+<br/>
+
+<label>system_recovery_delay</label>
+<input type="text" name="system_recovery_delay" value="<?=$system_recovery_delay?>" /> seconds
 <br/>
 
 <input type="submit" class="btn btn-primary"/>

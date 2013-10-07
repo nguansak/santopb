@@ -1,4 +1,9 @@
 
+<a class="btn btn-primary" href="http://10.14.2.81">CA01</a>
+<a class="btn btn-primary" href="http://10.14.2.82">CA02</a>
+<a class="btn btn-primary" href="http://10.14.2.83">CA03</a>
+<a class="btn btn-primary" href="http://10.14.2.84">CA04</a>
+<hr/>
 
 <a class="btn btn-primary" href="?setting">checkin</a>
 <a class="btn btn-primary" href="?setting">setting</a> 
@@ -38,7 +43,11 @@
 <hr/>
 <a class="btn btn-primary" href="?rfid_status=off">Off</a>
 <a class="btn btn-primary" href="?rfid_status=green">Green</a>
+<a class="btn btn-primary" href="?rfid_status=orange">Orange</a>
 <a class="btn btn-primary" href="?rfid_status=red">Red</a>
 <hr/>
 <a class="btn btn-primary" href="tail_log.php" target="_blank">Tail Log</a>
 <a class="btn btn-primary" href="tail_log2.php" target="_blank">Tail Log2</a>
+<hr/>
+<a class="btn btn-primary" href="?cmd=online">ONLINE</a>
+<a class="btn btn-primary" href="?cmd=offline">OFFLINE</a>

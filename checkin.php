@@ -3,10 +3,18 @@
 include_once("./lib/lib.inc.php");
 
 
-
 $userid = $_GET['userid'];
-write("\r\n");
-write("Got checkin {$userid}\r\n");
+writeln();
+writeln("Got checkin {$userid}");
+
+/*
+if (!isset($_GET['test'])) {
+	//send_rfid_status(SIGNAL_OFF);
+	exit();
+} else {
+	online();
+}
+*/
 
 if (is_offline()) {
 	write("System is offline!!");
@@ -17,19 +25,12 @@ if (!file_exists("command.run"))
 {
 	if (isset($_GET['userid']))
 	{
-		
 
 		$standby_delay_time = GetValue("standby_delay_time");
 
 		$_GET['next_run'] = strtotime("+{$standby_delay_time} sec");
-
 		
-		send_rfid_status(SIGNAL_GREEN);
-		send_rfid_status('green-on');
-
-		//usleep(500 * 1000);
-
-		//send_rfid_status(SIGNAL_OFF);
+		send_rfid_status(SIGNAL_ORANGE);
 
 		$json = json_encode($_GET);
 

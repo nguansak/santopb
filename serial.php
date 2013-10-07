@@ -5,12 +5,50 @@
 include "php_serial.class.php";
 $serial = null;
 
+
+$serialCallStackCount = 0;
+
+function autoSerialInit() {
+	global $serialCallStackCount;
+
+	//write("----- autoSerialInit B {$serialCallStackCount}");
+
+	if ($serialCallStackCount == 0) {
+		return _init();
+	}
+
+	$serialCallStackCount++;
+
+	//write("----- autoSerialInit F {$serialCallStackCount}");
+
+	return true;
+
+}
+
+
+function autoSerialClose() {
+	global $serialCallStackCount;
+	
+	//write("----- autoSerialInit B {$serialCallStackCount}");
+
+	$serialCallStackCount--;
+
+	if ($serialCallStackCount == 0) {
+		return _close();
+	}
+
+	//write("----- autoSerialClose F {$serialCallStackCount}");
+
+	return true;
+}
+
+
 function _init() {
-	global $serial;
+	global $serial, $serialCallStackCount;
+
 	if ($serial != null) return false;
 
-	send_rfid_status(SIGNAL_RED);
-
+	//send_rfid_status(SIGNAL_RED);
 
 	$serial = new phpSerial;
 	$serial->deviceSet("/dev/ttyACM0");
@@ -24,8 +62,11 @@ function _init() {
 
 	$serial->deviceOpen();
 
+	$serialCallStackCount = 1;
+
 	return true;
 }
+
 
 function microtime_float()
 {
@@ -34,9 +75,17 @@ function microtime_float()
 }
 
 
-function _send($cmd) {
+function _send($cmd, $verbal=true) {
 	global $serial;
-	write( "$cmd\n");
+
+	//$arr
+
+	$last_camera_active_time = microtime(true);
+
+	if ($verbal)
+	{
+		write( "$cmd");
+	}
 
 	if ($serial) {
 		$serial->sendMessage($cmd."\0");
@@ -125,13 +174,13 @@ function process_result_capture($result, $time) {
 	if ($pos) {
 		$cmd = substr($result,0,$pos);
 		$result = substr($result,$pos+2);
-		echo "## $time $cmd   "; 
+		echo "## $time $cmd   \n"; 
 		
 		//#sensor|B|on
 		$val = explode("|", $cmd);
 		//print_r($val);
 		if ($val[0] == "#auto-capture-done") {
-			writeln( "Auto Capture Done");
+			write("Auto Capture Done");
 			return "#auto-capture-done";
 		}
 		
@@ -150,7 +199,7 @@ function valid_senser_auto_capture($theResult) {
 
 	if ($pos !== false)
 	{
-		echo "Auto Capture Done";
+		//echo "Auto Capture Done";
 		return true;
 	}
 
@@ -197,7 +246,7 @@ function wait_senser() {
 			$t = microtime_float() - $start;
 
 	}
-	write( "end with timeout {$timeout}s\n");
+	write( "end with timeout {$timeout}s");
 	return false;
 }
 
@@ -238,6 +287,7 @@ function wait_auto_capture() {
         	}
 			
 			if ($t>$c) {
+				write('.');
 				echo ".";
 				//echo "---" . $theResult . "\n";
 				$c += 1;
@@ -245,15 +295,22 @@ function wait_auto_capture() {
 			$t = microtime_float() - $start;
 
 	}
-	write( "end with timeout {$timeout}s\n");
+	write( "end with timeout {$timeout}s");
 	return false;
 }
 
 function _close() {
-	global $serial; 
+	global $serial, $serialCallStackCount; 
 
-	send_rfid_status(SIGNAL_OFF);
+	if ($serial != null) {
 
-	$serial->deviceClose();
-	$serial = null;
+		//send_rfid_status(SIGNAL_GREEN);
+
+		$serial->deviceClose();
+		$serial = null;
+
+		$serialCallStackCount = 0;
+	}
+
+	write();
 }

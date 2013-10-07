@@ -1,5 +1,4 @@
-68\]442qbh]
-"1<?php
+<?php
 
 require_once "lib/lib.inc.php";
 
@@ -29,13 +28,13 @@ set_time_limit(60*60*2); // 2h
 echo "<pre>";
 
 
-$lines = '80';
+$lines = '200';
 
 if (isset($_GET['n'])) {
 	$lines = $_GET['n'];
 }
 
-echo date("Ymd_His") . "\r\n";
+//echo date("Ymd_His") . "\r\n";
 
 $fileName = 'app';
 $machine_code = GetValue("machine_code");

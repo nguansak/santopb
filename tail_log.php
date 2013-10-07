@@ -30,7 +30,7 @@ $filePath = "/var/log/cameracontrol/{$fileName}.log";
 
 echo( $filePath);
 
-$handle = popen("sudo tail -n 80 -F {$filePath} 2>&1", 'r');
+$handle = popen("sudo tail -n 200 -F {$filePath} 2>&1", 'r');
 while(!feof($handle)) {
     $buffer = fgets($handle);
     echo "$buffer";
