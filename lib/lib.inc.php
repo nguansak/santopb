@@ -193,12 +193,13 @@ function write($content='', $fileName = "app", $check_file=false)
 		}
 	}
 
-	print "$content\n";
+	
 	$fs = fopen($filePath, 'a');
 
 	if (($content != '.')&&($content != '#')) {
 		$content = "\n{$log_id}+[{$time}] : $content";
 	}
+	print "$content";
 	fwrite($fs, $content);
 	fclose($fs);
 }

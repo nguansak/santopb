@@ -578,38 +578,39 @@ function ensure_usb_normal_mode($check_secs=false) {
 
 }
 
+if (isset($cmd)) {
+	if (function_exists($cmd)) {
 
-if (function_exists($cmd)) {
 
+		if ($cmd==='online') {
+			
+			online();
 
-	if ($cmd==='online') {
-		
-		online();
-
-	} else if ($cmd==='offline') {
-		
-		offline();
-
-	} else if ($cmd==='set') {
-		
-		set();
-
-	} else {
-
-		if (!is_in_pocess()) {
-
+		} else if ($cmd==='offline') {
+			
 			offline();
 
-			$cmd();
-
-			online();
+		} else if ($cmd==='set') {
+			
+			set();
 
 		} else {
 
-			print("Warning: Camera is in process");
+			if (!is_in_pocess()) {
 
+				offline();
+
+				$cmd();
+
+				online();
+
+			} else {
+
+				print("Warning: Camera is in process");
+
+			}
 		}
+
+
 	}
-
-
 }

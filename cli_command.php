@@ -82,7 +82,7 @@ function getProcessCommand()
 				$run_main_state = $arrCommand->lastState;
 				write("#### RESUME STATE {$run_main_state}");
 			} else {
-				writeln("==============================================================================================")
+				writeln("==============================================================================================");
 				writeln("START RUNNING");
 			}
 
