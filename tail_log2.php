@@ -28,7 +28,7 @@ set_time_limit(60*60*2); // 2h
 echo "<pre>";
 
 
-$lines = '200';
+$lines = '500';
 
 if (isset($_GET['n'])) {
 	$lines = $_GET['n'];

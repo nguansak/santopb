@@ -567,7 +567,7 @@ function ensure_usb_normal_mode($check_secs=false) {
 		}
 	}
 
-	write("ensure_usb_normal_mode");
+	write("@");
 
 	if (autoSerialInit()) {
 

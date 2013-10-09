@@ -196,7 +196,7 @@ function write($content='', $fileName = "app", $check_file=false)
 	
 	$fs = fopen($filePath, 'a');
 
-	if (($content != '.')&&($content != '#')) {
+	if (($content != '.')&&($content != '#')&&($content != '@')) {
 		$content = "\n{$log_id}+[{$time}] : $content";
 	}
 	print "$content";
