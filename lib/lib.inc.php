@@ -77,11 +77,14 @@ function _exec($cmd, &$out = null, $verbal=true)
 
 	$retVal = proc_close($proc);
 
-	if (func_num_args() == 2) $out = array($ret, $err);
+	if (func_num_args() == 2) $out = array($retVal, $err);
+
 
 	if (!empty($ret)) {
 		if ($verbal) {
 			write( "> $ret");
+
+			print_r($out);
 		}
 	}
 
@@ -137,7 +140,7 @@ function _sudo_rmdir($file) {
 	}
 }
 
-function send_rfid_status($cmd, $control_command=false)
+function send_rfid_status($cmd, $control_command=false, $verbal=false)
 {
 	if (($control_command==false)&&(is_offline())) {
 		return false;
@@ -146,7 +149,7 @@ function send_rfid_status($cmd, $control_command=false)
 
 	$rfid_status_ip = GetValue("rfid_status_ip");
 
-	if (!$control_command) {
+	if (!$control_command || $verbal) {
 		write("send_rfid_status:{$cmd} to '{$rfid_status_ip}'");
 	}
 

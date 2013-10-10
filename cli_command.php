@@ -102,7 +102,7 @@ function getProcessCommand()
 				$system_recovery_delay = GetValue(system_recovery_delay);
 
 				if ($system_recovery_delay) {
-					writeln("sleep {$system_recovery_delay} secs");
+					writeln("Sleep for system recovery for {$system_recovery_delay} secs");
 					sleep($system_recovery_delay);
 				}
 

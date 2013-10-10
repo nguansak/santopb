@@ -41,6 +41,7 @@ if (isset($_GET['setting'])) {
 
 $rfid_status = @$_GET['rfid_status'];
 if ($rfid_status) {
+	
 	include "run_rfid_status.php";
 }
 

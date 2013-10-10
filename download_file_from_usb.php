@@ -9,7 +9,10 @@ function move_all_files_from_usbdrive($temp_picture_folder, $not_download_photo=
   
   _sudo("ls /mnt/usbdrive");
 
-  $file_list = _sudo("find /mnt/usbdrive/DCIM/ -name \*.JPG");
+  $file_list = _sudo("find /mnt/usbdrive/DCIM/ -name \*.JPG", $out);
+  if ($out[0]!=0) {
+    return false;
+  }
 
   if (!empty($file_list)) {
 
@@ -17,10 +20,18 @@ function move_all_files_from_usbdrive($temp_picture_folder, $not_download_photo=
     _sudo("ls $temp_picture_folder");
   
     if (!$not_download_photo) {
-  	  _sudo("find /mnt/usbdrive/DCIM/ -name \*.JPG -exec mv {} " . $temp_picture_folder . " \;");
+  	  _sudo("find /mnt/usbdrive/DCIM/ -name \*.JPG -exec mv {} " . $temp_picture_folder . " \;", $out);
+
+      if ($out[0]!=0) {
+        return false;
+      }
     }
 
-    $file_list_check = _sudo("find /mnt/usbdrive/DCIM/ -name \*.JPG"); 
+
+    $file_list_check = _sudo("find /mnt/usbdrive/DCIM/ -name \*.JPG", $out); 
+    if ($out[0]!=0) {
+        return false;
+    }
 
     if (!$not_download_photo) {
       if (!empty($file_list_check))
