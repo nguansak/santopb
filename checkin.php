@@ -4,6 +4,11 @@ include_once("./lib/lib.inc.php");
 
 
 $userid = $_GET['userid'];
+
+if (empty($userid)) {
+	die("userid is empty");
+}
+
 writeln();
 writeln("Got checkin {$userid}");
 
