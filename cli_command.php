@@ -43,7 +43,7 @@ function getProcessCommand()
 	} else {
 		write(".", "app", true);
 
-		send_rfid_status(SIGNAL_GREEN, true);
+		//send_rfid_status(SIGNAL_GREEN, true);
 
 		ensure_usb_normal_mode('00');
 		
