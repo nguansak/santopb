@@ -440,14 +440,22 @@ function capture() {
 	global $timestamp;
 	set();
 
+	SetValue("userid", "123");
+	
+
 	$seq = rand(0,99);
 	$seq = str_pad($seq, 2, "0", STR_PAD_LEFT); 
 
 	$timestamp = date("ymdHis".$seq) ;
+
+
+
 	SetValue("timestamp",$timestamp);
 	writeln("timestamp = $timestamp");
 
 	SetValue("timestamp",$timestamp);
+
+
 
 
 	write("run_main");
@@ -456,7 +464,7 @@ function capture() {
 		_send("normal-mode");
 		sleep(1);
 		_send("trigger-servo");
-		sleep(3);
+		sleep(5);
 
 		_send("trigger-servo");
 
